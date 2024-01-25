@@ -1,21 +1,23 @@
-import logo from './logo.svg';
 import './App.css';
+import { OpenAIProvider } from './context/openAIContext';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Index from './components/pages/landing/'
 
 function App() {
 
   return (
     <div className="App">
 
-      <AnswerProvider>
+      <OpenAIProvider>
         <Router>
           <Routes>
             {/* Index */}
             <Route exact path="/" element={<Index />} />
             {/* Question */}
-            <Route path="/:id" element={<Question />} />
+            {/* <Route path="/:id" element={<Question />} /> */}
           </Routes>
         </Router>
-      </AnswerProvider>
+      </OpenAIProvider>
 
     </div>
   );

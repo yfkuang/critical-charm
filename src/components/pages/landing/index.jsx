@@ -1,24 +1,33 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Container } from 'react-bootstrap'
-import QuestionButton from '../../QuestionButton'
-import { useAnswer } from '../../../context/answerContext'
+import { useOpenAI } from '../../../context/openAIContext'
 
 const Index = () => {
-    const { answerState } = useAnswer()
-    const { questions } = useAnswer()
-    const { init } = useAnswer()
+    const [message, setMessage] = useState("Loading...")
+    const { openAI } = useOpenAI()
+
+    const fetchMessage = async () => {
+        try {
+            const completion = await openAI.chat.completions.create({
+                messages: [{ role: "system", content: "Why do ducks eat bread? Answer in 2 sentences or less." }],
+                model: "gpt-3.5-turbo",
+                max_tokens: 100
+            });
+            
+            setMessage(JSON.stringify(completion.choices[0]['message']['content']))
+        } catch (error) {
+            console.log(error)
+            setMessage("Error generating description")
+        }
+    }
 
     useEffect(() => {
-        if (answerState.length < 23) {
-            init()
-        }
-    },[])
+        fetchMessage()
+    }, [])
 
     return (
         <Container fluid>
-            { questions.map( (question, index) =>
-                <QuestionButton index={index} key={index}/>
-            ) }
+            <p>{message}</p>
         </Container>
     )
 }

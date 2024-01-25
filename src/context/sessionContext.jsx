@@ -1,5 +1,47 @@
 import React, { createContext, useState, useContext } from 'react'
 
+export const Classes = [
+    "Barbarian",
+    "Bard",
+    "Cleric",
+    "Druid",
+    "Fighter",
+    "Monk",
+    "Paladin",
+    "Ranger",
+    "Rogue",
+    "Sorcerer",
+    "Warlock",
+    "Wizard",
+    "Artificer"
+]
+
+export const Races = [
+    "Dragonborn",
+    "Dwarf",
+    "Wood Elf",
+    "High Elf",
+    "Gnome",
+    "Half-Elf",
+    "Halfling",
+    "Orc",
+    "Half-Orc",
+    "Human",
+    "Tiefling",
+    "Goblin",
+    "Aarakocra",
+    "Aasimar",
+    "Centaur",
+    "Drow",
+    "Goliath",
+    "Firbolg",
+    "Hobgoblin",
+    "Kobold",
+    "Minotaur",
+    "Satyr",
+    "Tabaxi",
+]
+
 export const Styles = [
     "is sarcastic",
     "is laconic",
@@ -50,31 +92,31 @@ export const Styles = [
     "is like a redditor"
 ]
 
-export const AnswerContext = createContext({
-    answerState: {},
+export const sessionContext = createContext({
+    sessionState: {},
     questions: {},
     init: () => {},
-    setAnswerState: () => {},
+    setsessionState: () => {},
 })
 
-export function useAnswer() {
-    return useContext(AnswerContext)
+export function usesession() {
+    return useContext(sessionContext)
 }
 
-export function AnswerProvider(props) {
-    const [answerState, setAnswerState] = useState([])
+export function sessionProvider(props) {
+    const [sessionState, setsessionState] = useState([])
     const [questions, setQuestions] = useState([])
 
     const init = () => {
         Questions.forEach((question, key) => {
-            setAnswerState(answerState => [...answerState, [key, false]])
+            setsessionState(sessionState => [...sessionState, [key, false]])
             setQuestions(questions => [...questions, question])
         })
     }
 
     return (
-        <AnswerContext.Provider value={{answerState: answerState, questions: questions, setAnswerState: setAnswerState, init: init}}>
+        <sessionContext.Provider value={{sessionState: sessionState, questions: questions, setsessionState: setsessionState, init: init}}>
             {props.children}
-        </AnswerContext.Provider>
+        </sessionContext.Provider>
     )
 }
