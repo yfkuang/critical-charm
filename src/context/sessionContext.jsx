@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react'
 import { useOpenAI } from './openAIContext'
 
 const enableOpenAI = true
-const enableMidjourney = true
+const enableMidjourney = false
 
 export const Classes = [
     "Barbarian",
@@ -381,7 +381,8 @@ export function SessionProvider(props) {
         
         Promise.all([match.getName(openAI), match.getBio(openAI)]).then((results) => {
             match.getImages(openAI).then(() => {
-                console.log(match)
+                setMatches(matches => [...matches, match])
+                console.log(matches)
             }).catch(console.error)
         }).catch(console.error)
         

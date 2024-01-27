@@ -5,9 +5,9 @@ const Index = () => {
     
 
     return (
-        <Container fluid>
+        <>
             <Profile />
-        </Container>
+        </>
     )
 }
 

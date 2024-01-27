@@ -1,0 +1,9 @@
+.bio-entry {
+    margin: 20px 0;
+    padding: 20px;
+    text-align: justify;
+    font-size: 14pt;
+    font-family: 'Times New Roman', Times, serif;
+    background-color: blanchedalmond;
+    border-radius: 10px;
+}

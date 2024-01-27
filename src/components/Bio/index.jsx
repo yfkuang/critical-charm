@@ -1,9 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import './bio.css'
 
 const Bio = (props) =>{
   return (
-    <div>{props.bioEntry}</div>
+    <div className='bio-entry'>{props.bioEntry}</div>
   )
 }
 
