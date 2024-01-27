@@ -133,6 +133,57 @@ export const Activities = [
     "practicing potion-making"
 ]
 
+export const Attributes = [
+    "str",
+    "dex",
+    "con",
+    "int",
+    "wis",
+    "cha"
+]
+
+export class Quest {
+    constructor() {
+        //need to prevent duplicate attributes
+
+        this.requirements = {
+            "attribute1": Attributes[Math.floor(Math.random() * Attributes.length)],
+            "value1": Math.floor((Math.random() * 14) + 1),
+            "attribute2": Attributes[Math.floor(Math.random() * Attributes.length)],
+            "value2": Math.floor((Math.random() * 14) + 1),
+            "attribute3": Attributes[Math.floor(Math.random() * Attributes.length)],
+            "value3": Math.floor((Math.random() * 14) + 1),
+        }
+    }
+
+    async getQuest(openAI) {
+        if(enableOpenAI == true) {
+            try {
+                const completion = await openAI.chat.completions.create({
+                    messages: [{
+                        role: "system",
+                        content: `In paragraphs of 20 words or less, write 3 paragraphs addressing an adventurer and describing a quest to complete requiring the following attributes with values ranging from 1 (useless) to 20 (master):
+                        - ` + this.requirements['attribute1'] + `: ` + this.requirements['value1'] + `;
+                        - ` + this.requirements['attribute2'] + `: ` + this.requirements['value2'] + `;
+                        - ` + this.requirements['attribute3'] + `: ` + this.requirements['value3'] + `.
+                        Describe different attributes for each paragraph without explicitly stating the name of the attribute nor the value of the attribute and without any meta descriptions.`
+                    }],
+                    model: "gpt-3.5-turbo",
+                    // temperature: 0.5
+                })
+    
+                this.description = JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1).split(/\\n\\n/)
+                return
+            } catch (error) {
+                console.log(error)
+                this.description = ["Error generating match bio", "Error generating match bio", "Error generating match bio"]
+            }
+        } else {
+            this.description = ["Text Generation is disabled", "Text Generation is disabled", "Text Generation is disabled"]
+        } 
+    }
+}
+
 export class Match {
     constructor(race, charClass, gender, style1, style2) {
         this.race = race 
@@ -213,7 +264,7 @@ export class Match {
                 this.bio = ["Error generating match bio", "Error generating match bio", "Error generating match bio"]
             }
         } else {
-            this.name = ["Text Generation is disabled", "Text Generation is disabled", "Text Generation is disabled"]
+            this.bio = ["Text Generation is disabled", "Text Generation is disabled", "Text Generation is disabled"]
         }
         
     }
@@ -365,6 +416,7 @@ export class Match {
 
 export const sessionContext = createContext({
     matches: {},
+    generateQuest: () => {},
     generateProfile: () => {},
 })
 
@@ -375,6 +427,15 @@ export function useSession() {
 export function SessionProvider(props) {
     const { openAI } = useOpenAI()
     const [matches, setMatches] = useState([])
+
+    const generateQuest = () => {
+        const quest = new Quest()
+        
+        quest.getQuest(openAI).then(() => {
+            // setMatches(matches => [...matches, match])
+            console.log(quest)
+        }).catch(console.error)
+    }
 
     const generateProfile = () => {
         const match = new Match(
@@ -395,7 +456,7 @@ export function SessionProvider(props) {
     }
 
     return (
-        <sessionContext.Provider value={{matches: matches, generateProfile: generateProfile}}>
+        <sessionContext.Provider value={{matches: matches, generateQuest: generateQuest, generateProfile: generateProfile}}>
             {props.children}
         </sessionContext.Provider>
     )
