@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react'
 import { useOpenAI } from './openAIContext'
 
 const enableOpenAI = true
-const enableMidjourney = false
+const enableMidjourney = true
 
 export const Classes = [
     "Barbarian",
@@ -116,8 +116,25 @@ export const Photography = [
     "fashion photography"
 ]
 
+export const Activities = [
+    "hiking the countryside",
+    "fighting a monster",
+    "fighting the undead",
+    "drinking in a tavern",
+    "exploring a dungeon",
+    "exploring ruins",
+    "in a medieval town market",
+    "by a river",
+    "practicing magic",
+    "packing equipment",
+    "in a medieval weapons shop",
+    "finding treasure",
+    "finding a tomb",
+    "practicing potion-making"
+]
+
 export class Match {
-    constructor(race, charClass, gender, style1, style2) {
+    constructor(race, charClass, gender, style1, style2, images = []) {
         this.race = race 
         this.charClass = charClass
         this.gender = gender
@@ -131,6 +148,7 @@ export class Match {
             "wis" : Math.floor((Math.random() * 20) + 1),
             "cha" : Math.floor((Math.random() * 20) + 1) 
         }
+        this.images = images
     }
 
     async getName(openAI) {
@@ -153,7 +171,7 @@ export class Match {
                     }],
                     model: "gpt-3.5-turbo",
                     max_tokens: 50
-                });
+                })
     
                 this.name = JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1).replace('Name: ', '')
                 return
@@ -187,7 +205,7 @@ export class Match {
                     }],
                     model: "gpt-3.5-turbo",
                     // temperature: 0.5
-                });
+                })
     
                 this.bio = JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1).split(/\\n\\n/)
                 return
@@ -202,6 +220,56 @@ export class Match {
     }
 
     async getImages(openAI) {
+        this.bio.forEach(() => {
+            this.imagePrompt(openAI).then((result) => {
+                this.imageGeneration(result).then().catch(console.error)
+            }).catch(console.error)
+        })
+    }
+
+    async imagePrompt(openAI) {
+        //Generate image prompts
+        if(enableOpenAI == true) {
+            try {
+                const appearancePrompt = await openAI.chat.completions.create({
+                    messages: [{
+                        role: "system",
+                        content: `In a single paragraph of 100 words, describe the physical appearance, hair, facial appearance, and clothing of an adventurer with the following characteristics:
+                        - Race: ` + this.race + `;
+                        - Sex: ` + this.gender + `;
+                        - Class: ` + this.charClass + `;
+                        And the following attributes with values ranging from 1 (useless) to 20 (master):
+                        - Strength: ` + this.attributes['str'] + `;
+                        - Dexterity: ` + this.attributes['dex'] + `;
+                        - Constitution: ` + this.attributes['con'] + `;
+                        - Intelligence: ` + this.attributes['int'] + `;
+                        - Wisdom: ` + this.attributes['wis'] + `;
+                        - Charisma: ` + this.attributes['cha']
+                    }],
+                    model: "gpt-3.5-turbo",
+                })
+
+                const imagePrompt = await openAI.chat.completions.create({
+                    messages: [{
+                        role: "system",
+                        content: `You are a text prompt generator for Midjourney. Midjourney is an AI tool that generates images using a text prompts of only keywords. User will provide you the description with ‘Description’ and you will provide them with a ‘Prompt’ for it in a 100 keywords or less.
+                        
+                        Description: ` + this.gender + ` ` + this.race + ` ` + this.charClass + ` adventurer who is ` + Activities[Math.floor(Math.random() * Activities.length)] + ` and is described as follows: ` + JSON.stringify(appearancePrompt.choices[0]['message']['content']).substring(1,JSON.stringify(appearancePrompt.choices[0]['message']['content']).length - 1)
+                    }],
+                    model: "gpt-3.5-turbo",
+                })
+
+                return JSON.stringify(imagePrompt.choices[0]['message']['content']).substring(9,JSON.stringify(imagePrompt.choices[0]['message']['content']).length - 1)
+            } catch (error) {
+                console.log(error)
+                this.images = "Error generating match image"
+            }
+        } else {
+            this.name = ["Text Generation is disabled", "Text Generation is disabled", "Text Generation is disabled"]
+        }
+    }
+
+    async imageGeneration(prompt) {
         if(enableMidjourney == true) {
             try {
                 //Dall-E
@@ -227,7 +295,7 @@ export class Match {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        "prompt": "Barbarian Elf",
+                        "prompt": Photography[Math.floor(Math.random() * Photography.length)] + ` shot of a ` + (this.gender == 'Non-binary' || this.gender == 'Undefined Gender'  ? 'androgynous' : this.gender ) + ` ` + prompt + `, fantasy `,
                         "discord": process.env.REACT_APP_DISCORD_AUTH,
                         "server": process.env.REACT_APP_DISCORD_SERVER,
                         "channel": process.env.REACT_APP_DISCORD_CHANNEL,
@@ -268,11 +336,8 @@ export class Match {
                                                         }}).then((result) => result.json().then((data) => {
                                                             if(data.status == 'completed'){
                                                                 clearInterval(checkButtonStatus)
-                                                                this.images = data.attachments[0].url
-    
-                                                                console.log(this)
-    
-                                                                return
+                                                                this.images.push(data.attachments[0].url)
+                                                                return 
                                                             }
                                                         }).catch(console.error)).catch(console.error)
                                                 }, 500)
@@ -289,7 +354,6 @@ export class Match {
         } else {
             this.images = "Image generation is disabled"
         }
-        
     }
 }
 
@@ -316,23 +380,9 @@ export function SessionProvider(props) {
         )
         
         Promise.all([match.getName(openAI), match.getBio(openAI)]).then((results) => {
-            // match.name = results[0]
-            // match.bio = results[1]
-            
-            match.getImages(openAI).then((result) => {
-                match.images = result
-
-                const checkStatus = setInterval(() => {
-                    // console.log(match)
-                    if(match.images !== undefined){
-                        clearInterval(checkStatus)
-                        // console.log(match)
-                    }
-                }, 1500)
-
-                
+            match.getImages(openAI).then(() => {
+                console.log(match)
             }).catch(console.error)
-
         }).catch(console.error)
         
     }
