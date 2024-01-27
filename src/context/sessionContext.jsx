@@ -1,6 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import { useOpenAI } from './openAIContext'
 
+const enableOpenAI = true
+const enableMidjourney = false
+
 export const Classes = [
     "Barbarian",
     "Bard",
@@ -97,7 +100,7 @@ export const Styles = [
     "is formatted as a 4chan greentext (with >)",
     "is like a 4chan user",
     "is desperately horny",
-    "is like a redditor"
+    "is like a reddit troll"
 ]
 
 export const Photography = [
@@ -131,77 +134,162 @@ export class Match {
     }
 
     async getName(openAI) {
-        try {
-            const completion = await openAI.chat.completions.create({
-                messages: [{
-                    role: "system",
-                    content: `Generate a name for an adventurer with the following characteristics for the purpose of a bio on an app to match with other adventurers:
-                    - Race: ` + this.race + `;
-                    - Sex: ` + this.gender + `;
-                    - Class: ` + this.charClass + `;
-                    And the following attributes with values ranging from 1 (useless) to 20 (master):
-                    - Strength: ` + this.attributes['str'] + `;
-                    - Dexterity: ` + this.attributes['dex'] + `;
-                    - Constitution: ` + this.attributes['con'] + `;
-                    - Intelligence: ` + this.attributes['int'] + `;
-                    - Wisdom: ` + this.attributes['wis'] + `;
-                    - Charisma: ` + this.attributes['cha']
-                }],
-                model: "gpt-3.5-turbo",
-                max_tokens: 50
-            });
-
-            return JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1).replace('Name: ', '')
-        } catch (error) {
-            console.log(error)
-            return "Error generating match name"
+        if(enableOpenAI == true) {
+            try {
+                const completion = await openAI.chat.completions.create({
+                    messages: [{
+                        role: "system",
+                        content: `Generate a name for an adventurer with the following characteristics for the purpose of a bio on an app to match with other adventurers:
+                        - Race: ` + this.race + `;
+                        - Sex: ` + this.gender + `;
+                        - Class: ` + this.charClass + `;
+                        And the following attributes with values ranging from 1 (useless) to 20 (master):
+                        - Strength: ` + this.attributes['str'] + `;
+                        - Dexterity: ` + this.attributes['dex'] + `;
+                        - Constitution: ` + this.attributes['con'] + `;
+                        - Intelligence: ` + this.attributes['int'] + `;
+                        - Wisdom: ` + this.attributes['wis'] + `;
+                        - Charisma: ` + this.attributes['cha']
+                    }],
+                    model: "gpt-3.5-turbo",
+                    max_tokens: 50
+                });
+    
+                this.name = JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1).replace('Name: ', '')
+                return
+            } catch (error) {
+                console.log(error)
+                this.name = "Error generating match name"
+            }
+        } else {
+            this.name = "Text Generation is disabled"
         }
     }
 
     async getBio(openAI) {
-        try {
-            const completion = await openAI.chat.completions.create({
-                messages: [{
-                    role: "system",
-                    content: `In paragraphs of 20 words or less, write 3 paragraphs in first-person and in a style that ` + this.style1 + ` and that ` + this.style2 + ` for an adventurer with the following characteristics for the purpose of a bio on an app to match with other adventurers:
-                    - Race: ` + this.race + `;
-                    - Sex: ` + this.gender + `;
-                    - Class: ` + this.charClass + `;
-                    And the following attributes with values ranging from 1 (useless) to 20 (master):
-                    - Strength: ` + this.attributes['str'] + `;
-                    - Dexterity: ` + this.attributes['dex'] + `;
-                    - Constitution: ` + this.attributes['con'] + `;
-                    - Intelligence: ` + this.attributes['int'] + `;
-                    - Wisdom: ` + this.attributes['wis'] + `;
-                    - Charisma: ` + this.attributes['cha'] + `.
-                    Neither the attribute or the value can be explicitly stated. Use different attributes for each paragraph.`
-                }],
-                model: "gpt-3.5-turbo"
-            });
-
-            return JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1).split(/\\n\\n/)
-        } catch (error) {
-            console.log(error)
-            return ["Error generating match bio", "Error generating match bio", "Error generating match bio"]
+        if(enableOpenAI == true) {
+            try {
+                const completion = await openAI.chat.completions.create({
+                    messages: [{
+                        role: "system",
+                        content: `In paragraphs of 20 words or less, write 3 paragraphs in first-person and in a style that ` + this.style1 + ` and that ` + this.style2 + ` for an adventurer with the following characteristics for the purpose of a bio on an app to match with other adventurers:
+                        - Race: ` + this.race + `;
+                        - Sex: ` + this.gender + `;
+                        - Class: ` + this.charClass + `;
+                        And the following attributes with values ranging from 1 (useless) to 20 (master):
+                        - Strength: ` + this.attributes['str'] + `;
+                        - Dexterity: ` + this.attributes['dex'] + `;
+                        - Constitution: ` + this.attributes['con'] + `;
+                        - Intelligence: ` + this.attributes['int'] + `;
+                        - Wisdom: ` + this.attributes['wis'] + `;
+                        - Charisma: ` + this.attributes['cha'] + `.
+                        Describe different attributes for each paragraph without explicitly stating the name of the attribute nor the value of the attribute and without any meta descriptions.`
+                    }],
+                    model: "gpt-3.5-turbo",
+                    // temperature: 0.5
+                });
+    
+                this.bio = JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1).split(/\\n\\n/)
+                return
+            } catch (error) {
+                console.log(error)
+                this.bio = ["Error generating match bio", "Error generating match bio", "Error generating match bio"]
+            }
+        } else {
+            this.name = ["Text Generation is disabled", "Text Generation is disabled", "Text Generation is disabled"]
         }
+        
     }
 
     async getImages(openAI) {
-        //Dall-E
-
-        // try {
-        //     const image = await openAI.images.generate({
-        //         model: "dall-e-3",
-        //         prompt: `Fantasy ` + Photography[Math.floor(Math.random() * Photography.length)] + ` shot of a ` + this.gender + ` ` + this.race + ` ` + this.charClass + ` adventurer`
-        //     });
+        if(enableMidjourney == true) {
+            try {
+                //Dall-E
     
-        //     console.log(image.data)
-        // } catch (error) {
-        //     console.log(error)
-        //     return ["Error generating image", "Error generating image", "Error generating image"]
-        // }
+                // try {
+                //     const image = await openAI.images.generate({
+                //         model: "dall-e-3",
+                //         prompt: `Fantasy ` + Photography[Math.floor(Math.random() * Photography.length)] + ` shot of a ` + this.gender + ` ` + this.race + ` ` + this.charClass + ` adventurer`
+                //     });
+            
+                //     console.log(image.data)
+                // } catch (error) {
+                //     console.log(error)
+                //     return ["Error generating image", "Error generating image", "Error generating image"]
+                // }
+                
+                //Midjourney
+                
+                const requestOptions = {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': process.env.REACT_APP_USEAPI_MIDJOURNEY_TOKEN,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "prompt": "Barbarian Elf",
+                        "discord": process.env.REACT_APP_DISCORD_AUTH,
+                        "server": process.env.REACT_APP_DISCORD_SERVER,
+                        "channel": process.env.REACT_APP_DISCORD_CHANNEL,
+                        "maxJobs": 13,
+                    })
+                }
+    
+                fetch('https://api.useapi.net/v2/jobs/imagine', requestOptions)
+                    .then((result) => result.json().then((data) => {
+    
+                        const checkImagineStatus = setInterval(() => {
+                            fetch('https://api.useapi.net/v2/jobs/?jobid=' + data.jobid, {
+                                headers: {
+                                    'Authorization': process.env.REACT_APP_USEAPI_MIDJOURNEY_TOKEN,
+                                    'Content-Type': 'application/json'
+                                }}).then((result) => result.json().then((data) => {
+    
+                                    if(data.status == 'completed'){
+                                        clearInterval(checkImagineStatus)    
+                                        const requestOptions = {
+                                            method: 'POST',
+                                            headers: {
+                                                'Authorization': process.env.REACT_APP_USEAPI_MIDJOURNEY_TOKEN,
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                "jobid": data.jobid,
+                                                "button": "U1"
+                                            })
+                                        }
+                                        fetch('https://api.useapi.net/v2/jobs/button', requestOptions)
+                                            .then((result) => result.json().then((data) => {
+                                                const checkButtonStatus = setInterval(() => {
+                                                    fetch('https://api.useapi.net/v2/jobs/?jobid=' + data.jobid, {
+                                                        headers: {
+                                                            'Authorization': process.env.REACT_APP_USEAPI_MIDJOURNEY_TOKEN,
+                                                            'Content-Type': 'application/json'
+                                                        }}).then((result) => result.json().then((data) => {
+                                                            if(data.status == 'completed'){
+                                                                clearInterval(checkButtonStatus)
+                                                                this.images = data.attachments[0].url
+    
+                                                                console.log(this)
+    
+                                                                return
+                                                            }
+                                                        }).catch(console.error)).catch(console.error)
+                                                }, 500)
+                                            }).catch(console.error)).catch(console.error)
+                                    }
+                                }).catch(console.error)).catch(console.error)
+                        }, 5000)                
+                    }).catch(console.error)).catch(console.error)
+                
+            } catch (error) {
+                console.log(error)
+                this.images = "Error generating match image"
+            }
+        } else {
+            this.images = "Image generation is disabled"
+        }
         
-        //Midjourney
     }
 }
 
@@ -228,13 +316,21 @@ export function SessionProvider(props) {
         )
         
         Promise.all([match.getName(openAI), match.getBio(openAI)]).then((results) => {
-            match.name = results[0]
-            match.bio = results[1]
+            // match.name = results[0]
+            // match.bio = results[1]
             
             match.getImages(openAI).then((result) => {
                 match.images = result
 
-                console.log(match);
+                const checkStatus = setInterval(() => {
+                    // console.log(match)
+                    if(match.images !== undefined){
+                        clearInterval(checkStatus)
+                        // console.log(match)
+                    }
+                }, 1500)
+
+                
             }).catch(console.error)
 
         }).catch(console.error)

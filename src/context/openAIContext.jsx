@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect } from 'react'
 import OpenAI from 'openai'
-import Midjourney from "midjourney-discord-api";
 
 export const openAIContext = createContext({
     openAI: {}
