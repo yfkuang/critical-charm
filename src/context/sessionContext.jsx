@@ -134,7 +134,7 @@ export const Activities = [
 ]
 
 export class Match {
-    constructor(race, charClass, gender, style1, style2, images = []) {
+    constructor(race, charClass, gender, style1, style2) {
         this.race = race 
         this.charClass = charClass
         this.gender = gender
@@ -148,7 +148,6 @@ export class Match {
             "wis" : Math.floor((Math.random() * 20) + 1),
             "cha" : Math.floor((Math.random() * 20) + 1) 
         }
-        this.images = images
     }
 
     async getName(openAI) {
@@ -220,11 +219,11 @@ export class Match {
     }
 
     async getImages(openAI) {
-        this.bio.forEach(() => {
+        // this.bio.forEach(() => {
             this.imagePrompt(openAI).then((result) => {
                 this.imageGeneration(result).then().catch(console.error)
             }).catch(console.error)
-        })
+        // })
     }
 
     async imagePrompt(openAI) {
@@ -262,10 +261,10 @@ export class Match {
                 return JSON.stringify(imagePrompt.choices[0]['message']['content']).substring(9,JSON.stringify(imagePrompt.choices[0]['message']['content']).length - 1)
             } catch (error) {
                 console.log(error)
-                this.images = "Error generating match image"
+                this.image = "Error generating match image"
             }
         } else {
-            this.name = ["Text Generation is disabled", "Text Generation is disabled", "Text Generation is disabled"]
+            console.log("Text Generation is disabled")
         }
     }
 
@@ -336,7 +335,9 @@ export class Match {
                                                         }}).then((result) => result.json().then((data) => {
                                                             if(data.status == 'completed'){
                                                                 clearInterval(checkButtonStatus)
-                                                                this.images.push(data.attachments[0].url)
+                                                                this.image = data.attachments[0].url
+                                                                console.log(this)
+                                                                // this.images.push(data.attachments[0].url)
                                                                 return 
                                                             }
                                                         }).catch(console.error)).catch(console.error)
@@ -349,10 +350,15 @@ export class Match {
                 
             } catch (error) {
                 console.log(error)
-                this.images = "Error generating match image"
+                this.image = "Error generating match image"
             }
         } else {
-            this.images = "Image generation is disabled"
+            try {
+                this.image = "Image generation is disabled"
+            } catch (error) {
+                console.log(error)
+                this.image = "Image generation is disabled"
+            }
         }
     }
 }
@@ -379,7 +385,7 @@ export function SessionProvider(props) {
             Styles[Math.floor(Math.random() * Styles.length)]
         )
         
-        Promise.all([match.getName(openAI), match.getBio(openAI)]).then((results) => {
+        Promise.all([match.getName(openAI), match.getBio(openAI), match.getImages(openAI)]).then(() => {
             match.getImages(openAI).then(() => {
                 setMatches(matches => [...matches, match])
                 console.log(matches)
