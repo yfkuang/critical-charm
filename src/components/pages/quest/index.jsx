@@ -6,10 +6,14 @@ import { useSession } from '../../../context/sessionContext';
 const Quest = () => {
     const { quests } = useSession()
     const { generateQuest } = useSession()
-    const [questDescription, setQuestDescription] = useState(["Loading Quest...", "Loading Quest...", "Loading Quest..."])
+    const { generateProfile } = useSession()
+    const [questDescription, setQuestDescription] = useState(["Loading Quest..."])
     
     useEffect(() => {
         generateQuest()
+        // for (let i = 0; i < 3; i++) {
+        //     generateProfile()
+        // }
     }, [])
 
     useEffect(() => {

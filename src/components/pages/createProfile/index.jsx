@@ -6,7 +6,7 @@ const CreateProfile = () => {
 
     return (
         <>
-            <Link to="/quest"><Button variant="primary">Start Matching</Button></Link>
+            <Link to="/match"><Button variant="primary">Start Matching</Button></Link>
         </>
     )
 }

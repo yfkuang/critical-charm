@@ -13,3 +13,9 @@ img {
     background-color: blanchedalmond;
     border-radius: 1em;
 }
+
+.match-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}

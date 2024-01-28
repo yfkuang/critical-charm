@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useSession } from '../../context/sessionContext';
+import { Button } from 'react-bootstrap'
 import './profile.css'
 
 const Profile = () => {
-    const { matches } = useSession();
+    const { profiles } = useSession();
+    const { setProfiles } = useSession();
     const { generateProfile } = useSession()
     const [name, setName] = useState('Loading Name...')
     const [race, setRace] = useState('Loading Race...')
@@ -13,26 +15,39 @@ const Profile = () => {
     
 
     useEffect(() => {
-        generateProfile()
+        console.log(profiles)
     }, [])
 
     useEffect(() => {
-        if(matches.length > 0) {
-            setName(matches[0].name)
-            setRace(matches[0].race)
-            setClass(matches[0].charClass)
-            setBio(matches[0].bio)
-            // setImage(matches[0].image)
-            // console.log(matches[0].image)
+        if(profiles.length > 0) {
+            setName(profiles[0].name)
+            setRace(profiles[0].race)
+            setClass(profiles[0].charClass)
+            setBio(profiles[0].bio)
+            // setImage(profiles[0].image)
+            // console.log(profiles[0].image)
         }
-    }, [matches])
+    }, [profiles])
 
     useEffect(() => {
-        if(matches.length > 0) {
-            setImage(matches[0].image)
-            console.log(matches[0].image)
+        if(profiles.length > 0) {
+            setImage(profiles[0].image)
+            // console.log(profiles)
+            // console.log(profiles[0].image)
         }
-    }, [matches[0]])
+    }, [profiles[0]])
+
+    const like = (e) => {
+        
+        setProfiles(profiles.slice(1))
+        console.log(profiles)
+    }
+
+    const pass = (e) => {
+        setProfiles(profiles.slice(1))
+        generateProfile()
+        console.log(profiles)
+    }
 
     return (
         <>
@@ -46,6 +61,10 @@ const Profile = () => {
                     </>
                 )
             })}
+            <div className="match-buttons">
+                <Button variant="success" onClick={like}><i class="bi bi-arrow-through-heart-fill"></i></Button>
+                <Button variant="danger" onClick={pass}><i class="bi bi-heartbreak-fill"></i></Button>
+            </div>
         </>
     )
 }

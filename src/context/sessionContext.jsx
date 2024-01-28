@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react'
 import { useOpenAI } from './openAIContext'
 
 const enableOpenAI = true
-const enableMidjourney = false
+const enableMidjourney = true
 
 export const QuestLines = [
     "Embark on a perilous journey to defeat a fearsome dragon terrorizing a nearby kingdom.",
@@ -196,11 +196,11 @@ export class Quest {
                 const completion = await openAI.chat.completions.create({
                     messages: [{
                         role: "system",
-                        content: `In paragraphs of 20 words or less, write 3 paragraphs addressing the reader, an adventurer, and describe the tasks to complete their quest to ` + QuestLines[Math.floor(Math.random() * QuestLines.length)] + ` with the following requirements with values ranging from 1 (useless) to 20 (master):
+                        content: `You are the head of the adventuring guild. In paragraphs of 20 words or less, write an introductory paragraph addressing the reader, an adventurer, regarding their quest to ` + QuestLines[Math.floor(Math.random() * QuestLines.length)] + ` and 3 additional paragraphs describing the tasks to complete the task with the following requirements with values ranging from 1 (useless) to 20 (master):
                         - ` + this.requirements['attribute1'] + `: ` + this.requirements['value1'] + `;
                         - ` + this.requirements['attribute2'] + `: ` + this.requirements['value2'] + `;
                         - ` + this.requirements['attribute3'] + `: ` + this.requirements['value3'] + `.
-                        Describe different attributes for each paragraph without explicitly stating the name of the attribute nor the value of the attribute and without any meta descriptions.`
+                        Describe different attributes for each paragraph without explicitly stating the name of the attribute nor the value of the attribute and without any meta descriptions. Do not write a conclusion.`
                     }],
                     model: "gpt-3.5-turbo",
                     // temperature: 0.5
@@ -217,7 +217,7 @@ export class Quest {
     }
 }
 
-export class Match {
+export class Profile {
     constructor(race, charClass, gender, style1, style2) {
         this.race = race 
         this.charClass = charClass
@@ -305,6 +305,7 @@ export class Match {
     async getImages(openAI) {
         // this.bio.forEach(() => {
             this.imagePrompt(openAI).then((result) => {
+                // console.log(result)
                 this.imageGeneration(result).then().catch(console.error)
             }).catch(console.error)
         // })
@@ -354,7 +355,7 @@ export class Match {
 
     async imageGeneration(prompt) {
         if(enableMidjourney == true) {
-            try {
+            // try {
                 //Dall-E
     
                 // try {
@@ -420,9 +421,10 @@ export class Match {
                                                             if(data.status == 'completed'){
                                                                 clearInterval(checkButtonStatus)
                                                                 this.image = data.attachments[0].url
-                                                                console.log(this)
+                                                                // return data.attachments[0].url
+                                                                // console.log(this.image)
                                                                 // this.images.push(data.attachments[0].url)
-                                                                return 
+                                                                // return 
                                                             }
                                                         }).catch(console.error)).catch(console.error)
                                                 }, 500)
@@ -432,24 +434,25 @@ export class Match {
                         }, 5000)                
                     }).catch(console.error)).catch(console.error)
                 
-            } catch (error) {
-                console.log(error)
-                this.image = "Error generating match image"
-            }
+            // } catch (error) {
+            //     console.log(error)
+            //     this.image = "Error generating match image"
+            // }
         } else {
-            try {
+            // try {
                 this.image = "Image generation is disabled"
-            } catch (error) {
-                console.log(error)
-                this.image = "Image generation is disabled"
-            }
+            // } catch (error) {
+            //     console.log(error)
+            //     this.image = "Image generation is disabled"
+            // }
         }
     }
 }
 
 export const sessionContext = createContext({
-    quest: {},
-    matches: {},
+    quests: {},
+    profiles: {},
+    setProfiles: () => {},
     generateQuest: () => {},
     generateProfile: () => {},
 })
@@ -461,19 +464,18 @@ export function useSession() {
 export function SessionProvider(props) {
     const { openAI } = useOpenAI()
     const [quests, setQuests] = useState([])
-    const [matches, setMatches] = useState([])
+    const [profiles, setProfiles] = useState([])
+    const [matchImages, setMatchImages] = useState([])
 
     const generateQuest = () => {
         const quest = new Quest()
         quest.getQuest(openAI).then(() => {
             setQuests(quests => [...quests, quest])
-            console.log(quests)
         }).catch(console.error)
-        
     }
 
     const generateProfile = () => {
-        const match = new Match(
+        const profile = new Profile(
             Races[Math.floor(Math.random() * Races.length)],
             Classes[Math.floor(Math.random() * Classes.length)],
             Gender[Math.floor(Math.random() * Gender.length)],
@@ -481,17 +483,22 @@ export function SessionProvider(props) {
             Styles[Math.floor(Math.random() * Styles.length)]
         )
         
-        Promise.all([match.getName(openAI), match.getBio(openAI), match.getImages(openAI)]).then(() => {
-            match.getImages(openAI).then(() => {
-                setMatches(matches => [...matches, match])
-                console.log(matches)
+        Promise.all([profile.getName(openAI), profile.getBio(openAI)]).then(() => {
+            profile.getImages(openAI).then((result) => {
+                setProfiles(profiles => [...profiles, profile])
+                // console.log(result)
             }).catch(console.error)
         }).catch(console.error)
-        
     }
 
+    // useEffect(() => {
+    //     if(matches.length > 0) {
+    //         console.log(matches[0].image)
+    //     }
+    // }, [matches])
+
     return (
-        <sessionContext.Provider value={{quests: quests, matches: matches, generateQuest: generateQuest, generateProfile: generateProfile}}>
+        <sessionContext.Provider value={{quests: quests, profiles: profiles, setProfiles: setProfiles, generateQuest: generateQuest, generateProfile: generateProfile}}>
             {props.children}
         </sessionContext.Provider>
     )
