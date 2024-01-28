@@ -466,6 +466,7 @@ export class Profile {
 }
 
 export const sessionContext = createContext({
+    lives: 3,
     enableOpenAI: enableOpenAI,
     Races: Races,
     Classes: Classes,
@@ -474,6 +475,7 @@ export const sessionContext = createContext({
     setProfiles: () => {},
     setPlayerProfile: () => {},
     matches: {},
+    setActiveChat: () => {}, 
     setMatches: () => {},
     generateQuest: () => {},
     generateProfile: () => {},
@@ -490,6 +492,8 @@ export function SessionProvider(props) {
     const [profiles, setProfiles] = useState([])
     const [matches, setMatches] = useState([])
     const [playerProfile, setPlayerProfile] = useState()
+    const [lives, setLives] = useState(6)
+    const [activeChat, setActiveChat] = useState()
     // const [matchImages, setMatchImages] = useState([])
 
     const generateQuest = () => {
@@ -517,7 +521,7 @@ export function SessionProvider(props) {
     }
 
     return (
-        <sessionContext.Provider value={{enableOpenAI: enableOpenAI, Races: Races, Classes: Classes, quests: quests, profiles: profiles, setProfiles: setProfiles, playerProfile: playerProfile, setPlayerProfile: setPlayerProfile, matches: matches, setMatches: setMatches, generateQuest: generateQuest, generateProfile: generateProfile, startGenerationCount: startGenerationCount}}>
+        <sessionContext.Provider value={{lives: lives, activeChat: activeChat, setActiveChat: setActiveChat, enableOpenAI: enableOpenAI, Races: Races, Classes: Classes, quests: quests, profiles: profiles, setProfiles: setProfiles, playerProfile: playerProfile, setPlayerProfile: setPlayerProfile, matches: matches, setMatches: setMatches, generateQuest: generateQuest, generateProfile: generateProfile, startGenerationCount: startGenerationCount}}>
             {props.children}
         </sessionContext.Provider>
     )

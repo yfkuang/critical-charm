@@ -9,7 +9,12 @@ const Footer = (props) => {
 
     return (
         <>
-            <div className="footer"><Container fluid><h1>Footer</h1></Container></div>
+            <div className="footer">
+                <Container fluid>
+                    <Link to="/match"><i class="bi bi-heart-fill"></i></Link>
+                    <Link to="/matches"><i class="bi bi-chat-fill"></i></Link>
+                </Container>
+            </div>
         </>
     )
 }

@@ -1,0 +1,43 @@
+.chat-ui {
+    position: fixed;
+    bottom: 80px;
+    width: 100%;
+    left: 0;
+}
+
+.chat-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-container .system {
+    display: none;
+}
+
+.chat-container .assistant p, .chat-container .user p {
+    width: 70%;
+    padding: 10px;
+}
+
+.chat-container .assistant {
+    display: flex;
+    justify-content: left;
+}
+
+.chat-container .assistant p {
+    background-color: lightblue;
+    left: 0;
+    border-radius: 2em;
+}
+
+.chat-container .user {
+    display: flex;
+    justify-content: right;
+}
+
+.chat-container .user p {
+    background-color: beige;
+    right: 0;
+    border-radius: 2em;
+}

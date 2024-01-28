@@ -5,9 +5,15 @@ import { Container } from 'react-bootstrap';
 import './header.css'
 
 const Header = (props) => {
+    const { lives } = useSession()
+    console.log(lives)
+
     return (
         <>
-            <div className="header"><Container fluid><h1>Header</h1></Container></div>
+            <div className="header">
+                <Container fluid>
+                    Tries: {lives}
+                </Container></div>
             {props.children}
         </>
     )
