@@ -1,8 +1,12 @@
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css'
 import { OpenAIProvider } from './context/openAIContext';
 import { SessionProvider } from './context/sessionContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './components/pages/landing/'
+import Quest from './components/pages/quest';
+import CreateProfile from './components/pages/createProfile';
+import Profile from './components/Profile';
 import { Container } from 'react-bootstrap';
 
 function App() {
@@ -17,8 +21,12 @@ function App() {
               <Routes>
                 {/* Index */}
                 <Route exact path="/" element={<Index />} />
-                {/* Question */}
-                {/* <Route path="/:id" element={<Question />} /> */}
+                {/* Quest */}
+                <Route exact path="/quest" element={<Quest />} />
+                {/* Matches */}
+                <Route exact path="/createprofile" element={<CreateProfile />} />
+                {/* Matches */}
+                <Route path="/match" element={<Profile />} />
               </Routes>
             </Router>
           </Container>

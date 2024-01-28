@@ -1,12 +1,12 @@
-import { Container } from 'react-bootstrap'
-import Profile from '../../Profile'
+import { Button } from 'react-bootstrap'
+import { Link } from 'react-router-dom';
 
 const Index = () => {
     
 
     return (
         <>
-            <Profile />
+            <Link to="/quest"><Button variant="primary">Start Your Quest</Button></Link>
         </>
     )
 }
