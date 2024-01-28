@@ -3,6 +3,7 @@ import { useOpenAI } from './openAIContext'
 
 const enableOpenAI = true
 const enableMidjourney = true
+const startGenerationCount = 4 //default is 10
 
 export const QuestLines = [
     "Embark on a perilous journey to defeat a fearsome dragon terrorizing a nearby kingdom.",
@@ -355,89 +356,104 @@ export class Profile {
 
     async imageGeneration(prompt) {
         if(enableMidjourney == true) {
+            //Dall-E
+
             // try {
-                //Dall-E
-    
-                // try {
-                //     const image = await openAI.images.generate({
-                //         model: "dall-e-3",
-                //         prompt: `Fantasy ` + Photography[Math.floor(Math.random() * Photography.length)] + ` shot of a ` + this.gender + ` ` + this.race + ` ` + this.charClass + ` adventurer`
-                //     });
+            //     const image = await openAI.images.generate({
+            //         model: "dall-e-3",
+            //         prompt: `Fantasy ` + Photography[Math.floor(Math.random() * Photography.length)] + ` shot of a ` + this.gender + ` ` + this.race + ` ` + this.charClass + ` adventurer`
+            //     });
+        
+            //     console.log(image.data)
+            // } catch (error) {
+            //     console.log(error)
+            //     return ["Error generating image", "Error generating image", "Error generating image"]
+            // }
             
-                //     console.log(image.data)
-                // } catch (error) {
-                //     console.log(error)
-                //     return ["Error generating image", "Error generating image", "Error generating image"]
-                // }
-                
-                //Midjourney
-                
-                const requestOptions = {
-                    method: 'POST',
+            //Midjourney
+            
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Authorization': process.env.REACT_APP_USEAPI_MIDJOURNEY_TOKEN,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "prompt": Photography[Math.floor(Math.random() * Photography.length)] + ` shot of a ` + (this.gender == 'Non-binary' || this.gender == 'Undefined Gender'  ? 'androgynous' : this.gender ) + ` ` + prompt + `, fantasy `,
+                    "discord": process.env.REACT_APP_DISCORD_AUTH,
+                    "server": process.env.REACT_APP_DISCORD_SERVER,
+                    "channel": process.env.REACT_APP_DISCORD_CHANNEL,
+                    "maxJobs": 13,
+                })
+            }
+
+
+            const checkJobStatus = setInterval(() => {
+                fetch('https://api.useapi.net/v2/jobs', {
                     headers: {
                         'Authorization': process.env.REACT_APP_USEAPI_MIDJOURNEY_TOKEN,
                         'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        "prompt": Photography[Math.floor(Math.random() * Photography.length)] + ` shot of a ` + (this.gender == 'Non-binary' || this.gender == 'Undefined Gender'  ? 'androgynous' : this.gender ) + ` ` + prompt + `, fantasy `,
-                        "discord": process.env.REACT_APP_DISCORD_AUTH,
-                        "server": process.env.REACT_APP_DISCORD_SERVER,
-                        "channel": process.env.REACT_APP_DISCORD_CHANNEL,
-                        "maxJobs": 13,
-                    })
-                }
-    
-                fetch('https://api.useapi.net/v2/jobs/imagine', requestOptions)
-                    .then((result) => result.json().then((data) => {
-    
-                        const checkImagineStatus = setInterval(() => {
-                            fetch('https://api.useapi.net/v2/jobs/?jobid=' + data.jobid, {
-                                headers: {
-                                    'Authorization': process.env.REACT_APP_USEAPI_MIDJOURNEY_TOKEN,
-                                    'Content-Type': 'application/json'
-                                }}).then((result) => result.json().then((data) => {
-    
-                                    if(data.status == 'completed'){
-                                        clearInterval(checkImagineStatus)    
-                                        const requestOptions = {
-                                            method: 'POST',
+                    }}).then((result) => result.json().then((data) => {
+                        console.log(data)
+                        console.log(data.length < 3)
+
+                        if(data.length < 2) {
+                            clearInterval(checkJobStatus)
+
+                            fetch('https://api.useapi.net/v2/jobs/imagine', requestOptions)
+                                .then((result) => result.json().then((data) => {
+
+                                    const checkImagineStatus = setInterval(() => {
+                                        fetch('https://api.useapi.net/v2/jobs/?jobid=' + data.jobid, {
                                             headers: {
                                                 'Authorization': process.env.REACT_APP_USEAPI_MIDJOURNEY_TOKEN,
                                                 'Content-Type': 'application/json'
-                                            },
-                                            body: JSON.stringify({
-                                                "jobid": data.jobid,
-                                                "button": "U1"
-                                            })
-                                        }
-                                        fetch('https://api.useapi.net/v2/jobs/button', requestOptions)
-                                            .then((result) => result.json().then((data) => {
-                                                const checkButtonStatus = setInterval(() => {
-                                                    fetch('https://api.useapi.net/v2/jobs/?jobid=' + data.jobid, {
+                                            }}).then((result) => result.json().then((data) => {
+
+                                                if(data.status == 'completed'){
+                                                    clearInterval(checkImagineStatus)    
+                                                    const requestOptions = {
+                                                        method: 'POST',
                                                         headers: {
                                                             'Authorization': process.env.REACT_APP_USEAPI_MIDJOURNEY_TOKEN,
                                                             'Content-Type': 'application/json'
-                                                        }}).then((result) => result.json().then((data) => {
-                                                            if(data.status == 'completed'){
-                                                                clearInterval(checkButtonStatus)
-                                                                this.image = data.attachments[0].url
-                                                                // return data.attachments[0].url
-                                                                // console.log(this.image)
-                                                                // this.images.push(data.attachments[0].url)
-                                                                // return 
-                                                            }
+                                                        },
+                                                        body: JSON.stringify({
+                                                            "jobid": data.jobid,
+                                                            "button": "U1"
+                                                        })
+                                                    }
+                                                    fetch('https://api.useapi.net/v2/jobs/button', requestOptions)
+                                                        .then((result) => result.json().then((data) => {
+                                                            const checkButtonStatus = setInterval(() => {
+                                                                fetch('https://api.useapi.net/v2/jobs/?jobid=' + data.jobid, {
+                                                                    headers: {
+                                                                        'Authorization': process.env.REACT_APP_USEAPI_MIDJOURNEY_TOKEN,
+                                                                        'Content-Type': 'application/json'
+                                                                    }}).then((result) => result.json().then((data) => {
+                                                                        if(data.status == 'completed'){
+                                                                            clearInterval(checkButtonStatus)
+                                                                            this.image = data.attachments[0].url
+                                                                            // return data.attachments[0].url
+                                                                            // console.log(this.image)
+                                                                            // this.images.push(data.attachments[0].url)
+                                                                            // return 
+                                                                        }
+                                                                    }).catch(console.error)).catch(console.error)
+                                                            }, 500)
                                                         }).catch(console.error)).catch(console.error)
-                                                }, 500)
+                                                }
                                             }).catch(console.error)).catch(console.error)
-                                    }
+                                    }, 5000)                
                                 }).catch(console.error)).catch(console.error)
-                        }, 5000)                
+                        }
+
+
                     }).catch(console.error)).catch(console.error)
+            }, 4000 + Math.random() * 3000)
+
+            
                 
-            // } catch (error) {
-            //     console.log(error)
-            //     this.image = "Error generating match image"
-            // }
         } else {
             // try {
                 this.image = "Image generation is disabled"
@@ -457,6 +473,7 @@ export const sessionContext = createContext({
     setMatches: () => {},
     generateQuest: () => {},
     generateProfile: () => {},
+    startGenerationCount: startGenerationCount
 })
 
 export function useSession() {
@@ -501,7 +518,7 @@ export function SessionProvider(props) {
     // }, [matches])
 
     return (
-        <sessionContext.Provider value={{quests: quests, profiles: profiles, setProfiles: setProfiles, matches: matches, setMatches: setMatches, generateQuest: generateQuest, generateProfile: generateProfile}}>
+        <sessionContext.Provider value={{quests: quests, profiles: profiles, setProfiles: setProfiles, matches: matches, setMatches: setMatches, generateQuest: generateQuest, generateProfile: generateProfile, startGenerationCount: startGenerationCount}}>
             {props.children}
         </sessionContext.Provider>
     )
