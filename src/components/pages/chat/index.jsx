@@ -42,6 +42,9 @@ const Chat = () => {
                 model: "gpt-3.5-turbo",
             })
 
+            let completionMessage = {"role": "assistant", "content": JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1)}
+
+            setMessages(messages => [...messages, completionMessage])
             console.log(JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1))
         } catch (error) {
             console.log(error)
