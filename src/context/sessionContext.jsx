@@ -76,48 +76,6 @@ export const Gender = [
     "Undefined Gender"
 ]
 
-export const Classes = [
-    "Barbarian",
-    "Bard",
-    "Cleric",
-    "Druid",
-    "Fighter",
-    "Monk",
-    "Paladin",
-    "Ranger",
-    "Rogue",
-    "Sorcerer",
-    "Warlock",
-    "Wizard",
-    "Artificer"
-]
-
-export const Races = [
-    "Dragonborn",
-    "Dwarf",
-    "Wood Elf",
-    "High Elf",
-    "Gnome",
-    "Half-Elf",
-    "Halfling",
-    "Orc",
-    "Half-Orc",
-    "Human",
-    "Tiefling",
-    "Goblin",
-    "Aarakocra",
-    "Aasimar",
-    "Centaur",
-    "Drow",
-    "Goliath",
-    "Firbolg",
-    "Hobgoblin",
-    "Kobold",
-    "Minotaur",
-    "Satyr",
-    "Tabaxi",
-]
-
 export const Styles = [
     "is sarcastic",
     "is laconic",
