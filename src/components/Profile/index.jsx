@@ -59,8 +59,10 @@ const Profile = () => {
     return (
         <>
             <Header />
-            <h1>{name}</h1>
-            <h2>{race} {charClass}</h2>
+            <div className='name-group'>
+                <h1>{name}</h1>
+                <h2>{race} {charClass}</h2>
+            </div>
             <img src={image} alt={image} />
             {bio.map((bioEntry, key) => {
                 return(
