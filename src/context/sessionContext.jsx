@@ -453,6 +453,8 @@ export const sessionContext = createContext({
     quests: {},
     profiles: {},
     setProfiles: () => {},
+    matches: {},
+    setMatches: () => {},
     generateQuest: () => {},
     generateProfile: () => {},
 })
@@ -465,7 +467,8 @@ export function SessionProvider(props) {
     const { openAI } = useOpenAI()
     const [quests, setQuests] = useState([])
     const [profiles, setProfiles] = useState([])
-    const [matchImages, setMatchImages] = useState([])
+    const [matches, setMatches] = useState([])
+    // const [matchImages, setMatchImages] = useState([])
 
     const generateQuest = () => {
         const quest = new Quest()
@@ -484,7 +487,7 @@ export function SessionProvider(props) {
         )
         
         Promise.all([profile.getName(openAI), profile.getBio(openAI)]).then(() => {
-            profile.getImages(openAI).then((result) => {
+            profile.getImages(openAI).then(() => {
                 setProfiles(profiles => [...profiles, profile])
                 // console.log(result)
             }).catch(console.error)
@@ -498,7 +501,7 @@ export function SessionProvider(props) {
     // }, [matches])
 
     return (
-        <sessionContext.Provider value={{quests: quests, profiles: profiles, setProfiles: setProfiles, generateQuest: generateQuest, generateProfile: generateProfile}}>
+        <sessionContext.Provider value={{quests: quests, profiles: profiles, setProfiles: setProfiles, matches: matches, setMatches: setMatches, generateQuest: generateQuest, generateProfile: generateProfile}}>
             {props.children}
         </sessionContext.Provider>
     )

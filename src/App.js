@@ -8,6 +8,7 @@ import Quest from './components/pages/quest';
 import CreateProfile from './components/pages/createProfile';
 import Profile from './components/Profile';
 import { Container } from 'react-bootstrap';
+import Header from './components/header';
 
 function App() {
 
@@ -23,10 +24,10 @@ function App() {
                 <Route exact path="/" element={<Index />} />
                 {/* Quest */}
                 <Route exact path="/quest" element={<Quest />} />
-                {/* Matches */}
+                {/* Create Profile */}
                 <Route exact path="/createprofile" element={<CreateProfile />} />
-                {/* Matches */}
-                <Route path="/match" element={<Profile />} />
+                {/* Profiles */}
+                <Route exact path="/match" element={<Profile />} />
               </Routes>
             </Router>
           </Container>

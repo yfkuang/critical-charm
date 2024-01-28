@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap'
 import { Link } from 'react-router-dom';
-import { useSession } from '../../../context/sessionContext';
+import { useSession } from '../../../context/sessionContext'
+import GenerateButton from '../../generateButton';
 
 const Quest = () => {
     const { quests } = useSession()
@@ -11,9 +12,9 @@ const Quest = () => {
     
     useEffect(() => {
         generateQuest()
-        // for (let i = 0; i < 3; i++) {
-        //     generateProfile()
-        // }
+        for (let i = 0; i < 3; i++) {
+            generateProfile()
+        }
     }, [])
 
     useEffect(() => {
@@ -34,7 +35,7 @@ const Quest = () => {
                 )
             })}
             <p><b>Match with 4 other adventurers to complete this quest!</b></p>
-            <Link to="/createprofile"><Button variant="primary">Create Your Profile</Button></Link>
+            <Link to="/createprofile"><GenerateButton>Create Your Profile</GenerateButton></Link>
         </>
     )
 }

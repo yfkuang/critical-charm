@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useSession } from '../../context/sessionContext';
 import { Button } from 'react-bootstrap'
+import Header from '../header'
+import Footer from '../footer'
 import './profile.css'
 
 const Profile = () => {
     const { profiles } = useSession();
     const { setProfiles } = useSession();
+    const { matches } = useSession();
+    const { setMatches } = useSession();
     const { generateProfile } = useSession()
     const [name, setName] = useState('Loading Name...')
     const [race, setRace] = useState('Loading Race...')
@@ -38,19 +42,23 @@ const Profile = () => {
     }, [profiles[0]])
 
     const like = (e) => {
-        
+        setMatches(matches => [...matches, profiles[0]])
         setProfiles(profiles.slice(1))
-        console.log(profiles)
+        generateProfile()
+        generateProfile()
+        console.log(matches)
     }
 
     const pass = (e) => {
         setProfiles(profiles.slice(1))
+        generateProfile()
         generateProfile()
         console.log(profiles)
     }
 
     return (
         <>
+            <Header />
             <h1>{name}</h1>
             <h2>{race} {charClass}</h2>
             <img src={image} alt={image} />
@@ -65,6 +73,7 @@ const Profile = () => {
                 <Button variant="success" onClick={like}><i class="bi bi-arrow-through-heart-fill"></i></Button>
                 <Button variant="danger" onClick={pass}><i class="bi bi-heartbreak-fill"></i></Button>
             </div>
+            <Footer />
         </>
     )
 }

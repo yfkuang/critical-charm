@@ -1,12 +1,13 @@
 import { Button } from 'react-bootstrap'
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
+import GenerateButton from '../../generateButton'
 
 const CreateProfile = () => {
     
 
     return (
         <>
-            <Link to="/match"><Button variant="primary">Start Matching</Button></Link>
+            <Link to="/match"><GenerateButton>Start Matching</GenerateButton></Link>
         </>
     )
 }
