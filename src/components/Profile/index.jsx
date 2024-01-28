@@ -45,13 +45,11 @@ const Profile = () => {
         setMatches(matches => [...matches, profiles[0]])
         setProfiles(profiles.slice(1))
         generateProfile()
-        generateProfile()
         console.log(matches)
     }
 
     const pass = (e) => {
         setProfiles(profiles.slice(1))
-        generateProfile()
         generateProfile()
         console.log(profiles)
     }

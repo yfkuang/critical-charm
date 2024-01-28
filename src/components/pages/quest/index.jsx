@@ -12,9 +12,6 @@ const Quest = () => {
     
     useEffect(() => {
         generateQuest()
-        for (let i = 0; i < 3; i++) {
-            generateProfile()
-        }
     }, [])
 
     useEffect(() => {
@@ -35,7 +32,7 @@ const Quest = () => {
                 )
             })}
             <p><b>Match with 4 other adventurers to complete this quest!</b></p>
-            <Link to="/createprofile"><GenerateButton>Create Your Profile</GenerateButton></Link>
+            <Link to="/createprofile"><Button variant="primary">Create Your Profile</Button></Link>
         </>
     )
 }
