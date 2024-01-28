@@ -22,7 +22,7 @@ const Chat = () => {
     const [messages, setMessages] = useState([])
     
     useEffect(() => {
-        let newMessage = {"role": "system", "content": `You are ` + activeChat.name + `, a ` + activeChat.race + ` ` + activeChat.charClass}
+        let newMessage = {"role": "system", "content": `You are ` + activeChat.name + `, a ` + activeChat.race + ` ` + activeChat.charClass + `, and you are in dating app-like conversation with the goal of matching to complete a quest. Respond in a single paragraph of 20 words or less in a writing style that ` + activeChat.style1 + ` and that `  + activeChat.style1 + `.`}
 
         setMessages(messages => [...messages, newMessage])
     }, [])
