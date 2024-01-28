@@ -2,13 +2,14 @@ import { Button } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import GenerateButton from '../../generateButton'
 
-const Index = () => {
+const CreateProfile = () => {
+    
 
     return (
         <>
-            <Link to="/quest"><GenerateButton>Start Your Quest</GenerateButton></Link>
+            <Link to="/match"><GenerateButton>Start Matching</GenerateButton></Link>
         </>
     )
 }
 
-export default Index
+export default CreateProfile
