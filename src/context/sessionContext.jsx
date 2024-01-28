@@ -4,6 +4,29 @@ import { useOpenAI } from './openAIContext'
 const enableOpenAI = true
 const enableMidjourney = false
 
+export const QuestLines = [
+    "Embark on a perilous journey to defeat a fearsome dragon terrorizing a nearby kingdom.",
+    "Locate and recover a valuable or powerful artifact stolen from a sacred temple or royal treasury.",
+    "Save a kidnapped noble, ally, or loved one from the clutches of a notorious bandit or villain.",
+    "Navigate through a mysterious and dangerous forest to uncover hidden secrets, treasures, or ancient ruins.",
+    "Suppress a goblin rebellion that threatens a peaceful village or town.",
+    "Safeguard a caravan carrying precious cargo through treacherous lands infested with bandits and monsters.",
+    "Seek out and answer the riddles posed by a mythical creature to gain access to its lair and treasures.",
+    "Investigate and rid a haunted mansion of malevolent spirits and supernatural entities.",
+    "Discover a rare herb or magical remedy to cure a deadly plague affecting a population.",
+    "Protect the borderlands from invading orc hordes, ensuring the safety of nearby settlements.",
+    "Track down a missing heir to the throne who holds the key to preventing a kingdom from falling into chaos.",
+    "Lift a curse afflicting a village, transforming its inhabitants or causing other calamities.",
+    "Mediate between warring factions or tribes to establish peace and prevent further bloodshed.",
+    "Recover stolen cattle or livestock that are crucial to the livelihood of a farming community.",
+    "Carry an urgent message or important information across dangerous territories to a distant ally or faction.",
+    "Infiltrate and investigate a mysterious cult that poses a threat to the stability of the region.",
+    "Provide security for a royal procession traveling through dangerous territories.",
+    "Track and eliminate a dangerous werewolf terrorizing a village during the full moon.",
+    "Identify and expose a traitor within the ranks who threatens the security of a kingdom or organization.",
+    "Conquer a tower filled with challenging puzzles, traps, and guardians to prove one's worth and gain rewards."
+]
+
 export const Classes = [
     "Barbarian",
     "Bard",
@@ -144,16 +167,27 @@ export const Attributes = [
 
 export class Quest {
     constructor() {
-        //need to prevent duplicate attributes
+        //Set Attributes
+        let attribute1 = Attributes[Math.floor(Math.random() * Attributes.length)]
+        let attribute2
+        let attribute3
+        do {
+            attribute2 = Attributes[Math.floor(Math.random() * Attributes.length)]
+        } while (attribute2 == attribute1)
+        do {
+            attribute3 = Attributes[Math.floor(Math.random() * Attributes.length)]
+        } while (attribute3 == attribute1 || attribute3 == attribute2)
 
         this.requirements = {
-            "attribute1": Attributes[Math.floor(Math.random() * Attributes.length)],
+            "attribute1": attribute1,
             "value1": Math.floor((Math.random() * 14) + 1),
-            "attribute2": Attributes[Math.floor(Math.random() * Attributes.length)],
+            "attribute2": attribute2,
             "value2": Math.floor((Math.random() * 14) + 1),
-            "attribute3": Attributes[Math.floor(Math.random() * Attributes.length)],
+            "attribute3": attribute3,
             "value3": Math.floor((Math.random() * 14) + 1),
         }
+
+        this.description = []
     }
 
     async getQuest(openAI) {
@@ -162,7 +196,7 @@ export class Quest {
                 const completion = await openAI.chat.completions.create({
                     messages: [{
                         role: "system",
-                        content: `In paragraphs of 20 words or less, write 3 paragraphs addressing an adventurer and describing a quest to complete requiring the following attributes with values ranging from 1 (useless) to 20 (master):
+                        content: `In paragraphs of 20 words or less, write 3 paragraphs addressing the reader, an adventurer, and describe the tasks to complete their quest to ` + QuestLines[Math.floor(Math.random() * QuestLines.length)] + ` with the following requirements with values ranging from 1 (useless) to 20 (master):
                         - ` + this.requirements['attribute1'] + `: ` + this.requirements['value1'] + `;
                         - ` + this.requirements['attribute2'] + `: ` + this.requirements['value2'] + `;
                         - ` + this.requirements['attribute3'] + `: ` + this.requirements['value3'] + `.
@@ -173,7 +207,6 @@ export class Quest {
                 })
     
                 this.description = JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1).split(/\\n\\n/)
-                return
             } catch (error) {
                 console.log(error)
                 this.description = ["Error generating match bio", "Error generating match bio", "Error generating match bio"]
@@ -415,6 +448,7 @@ export class Match {
 }
 
 export const sessionContext = createContext({
+    quest: {},
     matches: {},
     generateQuest: () => {},
     generateProfile: () => {},
@@ -426,15 +460,16 @@ export function useSession() {
 
 export function SessionProvider(props) {
     const { openAI } = useOpenAI()
+    const [quests, setQuests] = useState([])
     const [matches, setMatches] = useState([])
 
     const generateQuest = () => {
         const quest = new Quest()
-        
         quest.getQuest(openAI).then(() => {
-            // setMatches(matches => [...matches, match])
-            console.log(quest)
+            setQuests(quests => [...quests, quest])
+            console.log(quests)
         }).catch(console.error)
+        
     }
 
     const generateProfile = () => {
@@ -456,7 +491,7 @@ export function SessionProvider(props) {
     }
 
     return (
-        <sessionContext.Provider value={{matches: matches, generateQuest: generateQuest, generateProfile: generateProfile}}>
+        <sessionContext.Provider value={{quests: quests, matches: matches, generateQuest: generateQuest, generateProfile: generateProfile}}>
             {props.children}
         </sessionContext.Provider>
     )

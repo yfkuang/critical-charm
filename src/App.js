@@ -26,7 +26,7 @@ function App() {
                 {/* Matches */}
                 <Route exact path="/createprofile" element={<CreateProfile />} />
                 {/* Matches */}
-                <Route path="/match/:id" element={<Profile />} />
+                <Route path="/match" element={<Profile />} />
               </Routes>
             </Router>
           </Container>
