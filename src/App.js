@@ -8,7 +8,9 @@ import Quest from './components/pages/quest';
 import CreateProfile from './components/pages/createProfile';
 import Profile from './components/Profile';
 import { Container } from 'react-bootstrap';
-import Header from './components/header';
+import Matches from './components/pages/matches';
+import Chat from './components/pages/chat';
+
 
 function App() {
 
@@ -27,6 +29,10 @@ function App() {
                 <Route exact path="/createprofile" element={<CreateProfile />} />
                 {/* Profiles */}
                 <Route exact path="/match" element={<Profile />} />
+                {/* Profiles */}
+                <Route exact path="/matches" element={<Matches />} />
+                {/* Profiles */}
+                <Route exact path="/chat" element={<Chat />} />
               </Routes>
             </Router>
           </Container>

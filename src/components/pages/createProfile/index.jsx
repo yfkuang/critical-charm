@@ -221,9 +221,9 @@ const CreateProfile = () => {
                 <p>Charisma: {isNaN(cha) ? "Re-generate" : cha}</p>
             }
 
-            {/* <Link to="/match"> */}
+            <Link to="/match">
                 <Button variant="primary" onClick={submit}>Start Matching</Button>
-            {/* </Link> */}
+            </Link>
         </>
     )
 }

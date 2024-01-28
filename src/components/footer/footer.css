@@ -7,3 +7,8 @@
     width: 100vw;
     height: 60px;
 }
+
+.footer .bi {
+    padding: 10px;
+    font-size: 15pt;
+}
