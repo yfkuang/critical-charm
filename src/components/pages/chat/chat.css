@@ -5,10 +5,17 @@
     left: 0;
 }
 
+.chat-ui textarea {
+    resize: none;
+}
+
 .chat-container {
     position: absolute;
     display: flex;
     flex-direction: column;
+    text-align: left;
+    height: calc(100vh - 250px);
+    overflow-y: scroll;
 }
 
 .chat-container .system {
@@ -16,8 +23,8 @@
 }
 
 .chat-container .assistant p, .chat-container .user p {
-    width: 70%;
-    padding: 10px;
+    max-width: 70%;
+    padding: 15px;
 }
 
 .chat-container .assistant {
@@ -28,7 +35,7 @@
 .chat-container .assistant p {
     background-color: lightblue;
     left: 0;
-    border-radius: 2em;
+    border-radius: 1em 1em 1em 0;
 }
 
 .chat-container .user {
@@ -39,5 +46,5 @@
 .chat-container .user p {
     background-color: beige;
     right: 0;
-    border-radius: 2em;
+    border-radius: 1em 1em 0 1em;
 }

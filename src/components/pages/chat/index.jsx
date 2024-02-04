@@ -9,12 +9,6 @@ import { Form } from 'react-bootstrap'
 import './chat.css'
 import { useOpenAI } from '../../../context/openAIContext';
 
-// export class Message {
-//     constructor(content) {
-//         this.user = user
-//         this.content = content
-//     }
-// }
 
 const Chat = () => {
     const { openAI } = useOpenAI()
@@ -27,34 +21,49 @@ const Chat = () => {
         setMessages(messages => [...messages, newMessage])
     }, [])
 
-    const submit = async () => {
+    const submit = async (e) => {
 
-        try {
-            let newMessage = {
-                "role": "user",
-                "content": document.getElementById('message').value
+        if(e.key == "Enter" || e.type == "click") {
+            let value = document.getElementById('message').value
+            let chat = document.getElementById("chat");
+            document.getElementById('message').value = ''
+            setTimeout(() => {
+                document.getElementById('message').value = ''
+                chat.scrollTop = chat.scrollHeight;
+            },1)
+            console.log(document.getElementById('message').value)
+
+            try {
+                let newMessage = {
+                    "role": "user",
+                    "content": value
+                }
+    
+                setMessages(messages => [...messages, newMessage])
+    
+                const completion = await openAI.chat.completions.create({
+                    messages: messages,
+                    model: "gpt-3.5-turbo",
+                })
+    
+                let completionMessage = {"role": "assistant", "content": JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1)}
+    
+                setMessages(messages => [...messages, completionMessage])
+                console.log(JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1))
+
+                setTimeout(() => {
+                    chat.scrollTop = chat.scrollHeight;
+                },1)
+            } catch (error) {
+                console.log(error)
             }
-
-            setMessages(messages => [...messages, newMessage])
-
-            const completion = await openAI.chat.completions.create({
-                messages: messages,
-                model: "gpt-3.5-turbo",
-            })
-
-            let completionMessage = {"role": "assistant", "content": JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1)}
-
-            setMessages(messages => [...messages, completionMessage])
-            console.log(JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1))
-        } catch (error) {
-            console.log(error)
         }
     }
 
     return (
         <>
             <Header />
-            <Container fluid className="chat-container">
+            <Container fluid className="chat-container" id="chat">
                 {messages.map((message) => {
                     return (
                         <div className='message-container'>
@@ -67,7 +76,7 @@ const Chat = () => {
             </Container>
             <div className='chat-ui'>
                 <Container fluid>
-                    <Form.Control as="textarea" id="message" rows={2} />
+                    <Form.Control as="textarea" id="message" rows={2} autofocus onKeyDown={submit} />
                     <Button variant="primary" onClick={submit}>Send</Button>
                 </Container>
             </div>
