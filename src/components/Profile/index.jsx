@@ -61,7 +61,7 @@ const Profile = () => {
                 <h1>{name}</h1>
                 <h2>{race} {charClass}</h2>
             </div>
-            <img src={image} alt={image} />
+            <img className='profile-image' src={image} alt={image} />
             {bio.map((bioEntry, key) => {
                 return(
                     <>

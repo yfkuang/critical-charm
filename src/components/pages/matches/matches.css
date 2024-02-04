@@ -1,14 +1,14 @@
-.chat-container {
+.match-container {
     margin-top: 60px;
 }
 
-.chat-container .match {
+.match-container .match {
     box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
     padding: 20px 10px;
     text-align: left;
 }
 
-.chat-container img {
+.match-container img {
     height: 50px;
     width: 50px;
     border-radius: 5em;

@@ -19,7 +19,7 @@ const Matches = () => {
     return (
         <>
             <Header />
-                <div className='chat-container'>
+                <div className='match-container'>
                     {matches.map((match) => {
                         return (
                             <div className='match'>
