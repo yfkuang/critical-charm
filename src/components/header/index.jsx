@@ -6,7 +6,7 @@ import './header.css'
 
 const Header = (props) => {
     const { lives } = useSession()
-    console.log(lives)
+    // console.log(lives)
 
     return (
         <>

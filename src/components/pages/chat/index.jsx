@@ -14,55 +14,76 @@ const Chat = () => {
     const { openAI } = useOpenAI()
     const { activeChat } = useSession()
     const [messages, setMessages] = useState([])
+    const chat = document.getElementById("chat");
+    console.log(activeChat)
     
     useEffect(() => {
-        let newMessage = {"role": "system", "content": `You are ` + activeChat.name + `, a ` + activeChat.race + ` ` + activeChat.charClass + `, and you are in dating app-like conversation with the goal of matching to complete a quest. Respond in a single paragraph of 20 words or less in a writing style that ` + activeChat.style1 + ` and that `  + activeChat.style1 + `.`}
+        let newMessage = {"role": "system", "content": `You are ` + activeChat.name + `, a ` + activeChat.race + ` ` + activeChat.charClass + `, and you are in dating app-like conversation with the goal of matching to complete a quest. Respond in a single paragraph of 10 words or less in a writing style that ` + activeChat.style1 + ` and that `  + activeChat.style1 + `.`}
 
         setMessages(messages => [...messages, newMessage])
     }, [])
 
-    const submit = async (e) => {
+    useEffect(() => {
+        if(messages.length > 0) {
+            if(messages[messages.length - 1].role == 'user') {
+                request()
+            }
+        }
+    }, [messages])
 
+    const submit = async (e) => {
         if(e.key == "Enter" || e.type == "click") {
             let value = document.getElementById('message').value
-            let chat = document.getElementById("chat");
+            
             document.getElementById('message').value = ''
             setTimeout(() => {
                 document.getElementById('message').value = ''
                 chat.scrollTop = chat.scrollHeight;
             },1)
-            console.log(document.getElementById('message').value)
 
-            try {
-                let newMessage = {
-                    "role": "user",
-                    "content": value
-                }
-    
-                setMessages(messages => [...messages, newMessage])
-    
-                const completion = await openAI.chat.completions.create({
-                    messages: messages,
-                    model: "gpt-3.5-turbo",
-                })
-    
-                let completionMessage = {"role": "assistant", "content": JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1)}
-    
-                setMessages(messages => [...messages, completionMessage])
-                console.log(JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1))
-
-                setTimeout(() => {
-                    chat.scrollTop = chat.scrollHeight;
-                },1)
-            } catch (error) {
-                console.log(error)
+            let newMessage = {
+                "role": "user",
+                "content": value
             }
+
+            setMessages(messages => [...messages, newMessage])
         }
+    }
+
+    const request = async () => {
+        try {
+            const completion = await openAI.chat.completions.create({
+                messages: messages,
+                model: "gpt-3.5-turbo",
+            })
+
+            let completionMessage = {"role": "assistant", "content": JSON.stringify(completion.choices[0]['message']['content']).substring(1,JSON.stringify(completion.choices[0]['message']['content']).length - 1)}
+
+            setMessages(messages => [...messages, completionMessage])
+
+            setTimeout(() => {
+                chat.scrollTop = chat.scrollHeight;
+            },1)
+        } catch (error) {
+            console.log(error)
+        }
+
+        console.log(messages)
     }
 
     return (
         <>
             <Header />
+            <div className='chat-header'>
+                <Container fluid>
+                    <img className='chat-header-image' src={activeChat.image} alt={activeChat.name} />
+                    <div className='chat-header-text'>
+                        <h2>{activeChat.name}</h2>
+                        <h4>{activeChat.race} {activeChat.charClass}</h4>
+                    </div>
+                    
+                </Container>
+            </div>
             <Container fluid className="chat-container" id="chat">
                 {messages.map((message) => {
                     return (
